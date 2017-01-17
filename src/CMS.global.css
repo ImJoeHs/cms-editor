@@ -1,0 +1,58 @@
+.editor-demo {
+  margin: 10px auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.editor-demo .row {
+  margin: 10px 0;
+}
+.editor-demo .col {
+  max-width: 1000px;
+  min-width: 658px;
+  margin: 5px 10px;
+  flex: 1;
+}
+.editor-demo .radio-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+.editor-demo .radio-item input {
+  margin-right: 5px;
+}
+.editor-demo .source {
+  display: block;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  min-width: 658px;
+  min-height: 165px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  font-family: Inconsolata,Menlo,Consolas,monospace;
+  font-size: 13px;
+  line-height: 18px;
+  resize: vertical;
+}
+.editor-demo .react-rte-demo .public-DraftEditor-content {
+  min-height: 110px;
+}
+.example-enter {
+  opacity: 0.01;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.example-leave {
+  opacity: 1;
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}

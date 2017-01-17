@@ -53,6 +53,10 @@ export default class EditorToolbar extends Component {
     };
   }
 
+  refs = {
+    imgUpload: (HTMLInputElement),
+  }
+
   componentWillMount() {
     // Technically, we should also attach/detach event listeners when the
     // `keyEmitter` prop changes.
@@ -70,9 +74,10 @@ export default class EditorToolbar extends Component {
         {this._renderInlineStyleButtons()}
         {this._renderBlockTypeButtons()}
         {this._renderLinkButtons()}
-        {this._renderImageButton()}
         {this._renderBlockTypeDropdown()}
         {this._renderUndoRedo()}
+        {this._renderChangeFormat()}
+        {this._renderImageButton()}
       </div>
     );
   }
@@ -160,13 +165,24 @@ export default class EditorToolbar extends Component {
   _renderImageButton(): React.Element {
     return (
       <ButtonGroup>
-        <PopoverIconButton
-          label="Image"
-          iconName="image"
-          showPopover={this.state.showImageInput}
-          onTogglePopover={this._toggleShowImageInput}
-          onSubmit={this._setImage}
+        <IconButton
+          label="SelectImage"
+          iconName="selectImage"
+          onClick={this._selectImage}
         />
+        <IconButton
+          label="UploadImage"
+          iconName="uploadImage"          
+          onClick={this._uploadImage}
+          >
+          <input 
+            type="file"
+            ref="imgUpload" 
+            style={{ display: 'none' }}
+            accept="image/*"
+            onChange={this.uploadOnChange}
+          />
+        </IconButton>
       </ButtonGroup>
     );
   }
@@ -194,6 +210,26 @@ export default class EditorToolbar extends Component {
       </ButtonGroup>
     );
   }
+
+  _renderChangeFormat(): React.Element {
+    const formats = ['markdown', 'html'];
+    let buttons = formats.map((format, index) => (
+        <StyleButton
+          key={index}
+          label={format}
+          style={format}
+          iconName="redo"
+          isActive={format === this.state.sourcePanel}
+          onToggle={this._toggleChangeFormat}
+        />
+    ));
+    return (
+      <ButtonGroup>
+        {buttons}
+      </ButtonGroup>
+    );
+  }
+
 
   _onKeypress(event: Object, eventFlags: Object) {
     // Catch cmd+k for use with link insertion.
@@ -339,4 +375,48 @@ export default class EditorToolbar extends Component {
       this.props.focusEditor();
     }, 50);
   }
+
+  _toggleChangeFormat(format:string) {
+    let {sourcePanel} = this.state;
+    let {formatChange} = this.context;
+    format = sourcePanel === format ? '' : format;
+    this.setState({
+      sourcePanel: format,
+    });
+    formatChange(format);
+  }
+
+  _selectImage() {
+    let {selectImage} = this.context;
+    selectImage(this._setImage);
+  }
+
+  _uploadImage() {
+    const el = this.refs.imgUpload;
+    if (!el) return;
+    el.click();
+  }
+
+  uploadOnChange(...f) {
+    console.log(f);
+    const formData = new FormData();
+    formData.set('uploadImg', this.refs.imgUpload.files[0]);
+    let {uploadImage} = this.context;
+    uploadImage(formData, this._setImage);
+  }
+
+  handleUploadEditorImg = info => {
+    const file = info.file;
+    if (file.status === 'done' && file.response.message === 'ok') {
+      const url = file.response.file_upload_path + file.response.file.id + '_o.jpg';
+      console.log(url);
+      this._setImage(url);
+    }
+  }
 }
+
+EditorToolbar.contextTypes = {
+  formatChange: React.PropTypes.func,
+  selectImage: React.PropTypes.func,
+  uploadImage: React.PropTypes.func,
+};
